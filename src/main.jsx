@@ -1,19 +1,38 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import App from './App.jsx';
-import AddImage from './AddImage.jsx';
+import React from 'react'
+import ReactDOM from 'react-dom/client'; // Import createRoot from react-dom/client
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 
-// add router
+// import AddLabels from './component/AddLabel.jsx';
+// import Video from './component/Video.jsx'
+import Canvas from './component/Canvas.jsx';
+import Register from './component/Register.jsx';
+import Login from './component/Login.jsx';
+import ProtectedRoute from './protectedRoute/ProtectedRoute.jsx';
+
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Login />
+  },
+  {
+    path: '/register',
+    element: <Register />
+  },
+  {
+    path: '/login',
+    element: <Login />
+  },
+  {
+    path: '/canvas',
+    element: <ProtectedRoute><Canvas /></ProtectedRoute>
+  }
+]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Router>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/add" element={<AddImage />} />
-      </Routes>
-    </Router>
+    <RouterProvider router={router} />
   </React.StrictMode>,
 );

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as faceapi from 'face-api.js';
-import './App.css';
-import axios from 'axios';
+import axios from 'axios'
+import Video from '../style/video.module.css'
 
+import { Container } from 'react-bootstrap';
 
 function App() {
+
   const videoHeight = 450;
   const videoWidth = 600;
   const videoRef = useRef();
@@ -12,13 +14,14 @@ function App() {
   const [person, setPerson] = useState([]);
   const [emotion, setEmotion] = useState([]);
   const [distance, setDistance] = useState([]);
-  const [memory, setMemory] = useState([]);
 
+  // Load Models / Viodeo addEventListener 
   useEffect(() => {
     loadModels();
     videoRef.current.addEventListener('play', runFaceRecognition);
   }, []);
 
+  // Load Models / Start Video
   const loadModels = async () => {
     try {
       await Promise.all([
@@ -34,34 +37,39 @@ function App() {
     }
   };
 
-  function getLabeledFaceDescriptions() {
-    const labels = ["Bike", "Peem"];
-    return Promise.all(
-      labels.map(async (label) => {
-        const descriptions = [];
-        for (let i = 1; i < 2; i++) {
-          const img = await faceapi.fetchImage(`../public/labels/${label}/${i}.png`);
-          const detections = await faceapi
-            .detectSingleFace(img)
-            .withFaceLandmarks()
-            .withFaceDescriptor();
-          descriptions.push(detections.descriptor);
-        }
-        return new faceapi.LabeledFaceDescriptors(label, descriptions);
-      })
-    );
+  // Get Images and Labels for Model
+  async function getLabeledFaceDescriptions() {
+    try {
+      const response = await axios.get('http://localhost:5000/getLabelFolder');
+      const { folders } = response.data;
+
+      const labeledFaceDescriptors = await Promise.all(
+        folders.map(async (label) => {
+          const descriptions = [];
+          for (let i = 1; i < 2; i++) {
+            const img = await faceapi.fetchImage(`http://localhost:5000/getImageFolder/${label}/${i}.png`);
+
+            const detections = await faceapi
+              .detectSingleFace(img)
+              .withFaceLandmarks()
+              .withFaceDescriptor();
+
+            if (detections) {
+              descriptions.push(detections.descriptor);
+            }
+          }
+          return new faceapi.LabeledFaceDescriptors(label, descriptions);
+        })
+      );
+
+      return labeledFaceDescriptors;
+    } catch (error) {
+      console.error('Error:', error);
+      throw new Error('Error fetching labeled face descriptions');
+    }
   }
 
-  useEffect(() => {
-    for (let i = 0; i < person.length; i++) {
-      // Check if the current person is not in 'memory'
-      if (!memory.includes(person[i])) {
-        autoSaveToDB(person[i]);
-      }
-    }
-    setMemory([...memory, ...person]);
-  }, [person]);
-
+  // Prediction
   const runFaceRecognition = async () => {
     const labeledFaceDescriptors = await getLabeledFaceDescriptions();
     const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
@@ -98,8 +106,6 @@ function App() {
         setDistance((prevDistance) => [...prevDistance, result.distance]);
       });
 
-      
-
       detections.forEach((result, i) => {
         setEmotion((prevEmotion) => [
           ...prevEmotion,
@@ -119,29 +125,13 @@ function App() {
     }, 100);
   };
 
-
-  const autoSaveToDB = async (person) => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/addData', { person: person });
-  
-      console.log('Data saved to the database:', response.data);
-    } catch (error) {
-      console.error('Error saving data to the database:', error);
-    }
-  };
-
-
-
   return (
-    <>
-      <video ref={videoRef} autoPlay muted height={videoHeight} width={videoWidth}></video>
-
-      {person.map((d, i) => (
-        <p key={i}>{d}</p>
-      ))}
-
-      {person.length}
-    </>
+    <Container>
+      <div className={Video.frame} >
+        <video className={Video.video} ref={videoRef} autoPlay muted height={videoHeight} width={videoWidth}>
+        </video>
+      </div>
+    </Container>
   );
 }
 
