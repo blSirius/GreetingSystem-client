@@ -10,7 +10,11 @@ import Canvas from './component/Canvas.jsx';
 import Register from './component/Register.jsx';
 import Login from './component/Login.jsx';
 import ProtectedRoute from './protectedRoute/ProtectedRoute.jsx';
+import AddLabel from './component/AddLabel.jsx'
+import Home from './component/Home.jsx';
+import Video from './component/Video.jsx'
 
+import { UserAuthContextProvider } from './protectedRoute/UserAuthContext.jsx';
 
 const router = createBrowserRouter([
   {
@@ -28,11 +32,25 @@ const router = createBrowserRouter([
   {
     path: '/canvas',
     element: <ProtectedRoute><Canvas /></ProtectedRoute>
+  },
+  {
+    path: '/addLabel',
+    element: <AddLabel />
+  },
+  {
+    path: '/home',
+    element: <ProtectedRoute><Home /></ProtectedRoute>
+  },
+  {
+    path: '/video',
+    element: <Video />
   }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <UserAuthContextProvider>
+      <RouterProvider router={router} />
+    </UserAuthContextProvider>
   </React.StrictMode>,
 );
