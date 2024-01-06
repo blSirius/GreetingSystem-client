@@ -4,13 +4,13 @@ import { Container } from 'react-bootstrap'
 import { useUserAuth } from '../protectedRoute/UserAuthContext';
 
 function Home() {
-    const {user} = useUserAuth();
+    const auth = useUserAuth();
 
     return (
         <>
             <NavBar />
             <Container>
-                {user}
+                {auth.user}
             </Container>
         </>
     )

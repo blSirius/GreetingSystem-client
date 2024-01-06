@@ -1,47 +1,75 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+// UserAuthContext.jsx
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 
 const UserAuthContext = createContext();
 
-export function UserAuthContextProvider({ children }) {
+export const UserAuthContextProvider = ({ children }) => {
+    const [user, setUser] = useState('');
 
-    // const [user, setUser] = useState('');
-    let token = localStorage.getItem('token');
-    let user = 'f';
+    useEffect(() => {
+        decodedToken();
+    }, []);
 
-    const decodedToken = async () => {
-
+    const login = async (username, password) => {
         try {
-            const response = await axios.post('http://localhost:5000/decode-token', {
-                token,
+            const response = await axios.post('http://localhost:5000/login', {
+                username,
+                password,
             });
-
-            console.log('Login successful:', response.data.decoded.username);
-            // setUser(response.data.decoded.username);
-            user = response.data.decoded.username;
-        }
-        catch (error) {
-            console.error('Error decoding token:', error.response ? error.response.data : error.message);
-            throw error;
+            console.log('Login successful:', response.data);
+            localStorage.setItem('token', response.data.token);
+            decodedToken();
+        } catch (error) {
+            console.error('Error during login:', error.response.data);
         }
     };
 
-    useEffect(() => {
-        if (localStorage.getItem('token') === null) {
-            // setUser('none')
+    const decodedToken = async () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const response = await axios.post('http://localhost:5000/decode-token', {
+                    token,
+                });
+                setUser(response.data.decoded.username);
+            } catch (error) {
+                console.error('Error decoding token:', error.response ? error.response.data : error.message);
+                localStorage.removeItem('token');
+            }
         }
-        else {
-            decodedToken();
-        };
-    }, [])
+    };
+
+    const logout = () => {
+        setUser('');
+        localStorage.removeItem('token');
+    };
+
+    const getCurrentUser = async () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const response = await axios.post('http://localhost:5000/decode-token', {
+                    token,
+                });
+                const currentUser = response.data.decoded.username;
+                return currentUser;
+            } catch (error) {
+                console.error('Error decoding token:', error.response ? error.response.data : error.message);
+                localStorage.removeItem('token');
+            }
+        }
+        return null;
+
+    }
 
     return (
-        <UserAuthContext.Provider value={{ user }} >
+        <UserAuthContext.Provider value={{ user, login, logout, getCurrentUser }} >
             {children}
         </UserAuthContext.Provider>
-    )
+    );
 }
 
-export function useUserAuth() {
+export const useUserAuth = () => {
     return useContext(UserAuthContext);
 }

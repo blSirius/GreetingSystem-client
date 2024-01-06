@@ -1,49 +1,49 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Container } from 'react-bootstrap';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useUserAuth } from '../protectedRoute/UserAuthContext';
 
-    function Login() {
-        const [username, setUsername] = useState('');
-        const [password, setPassword] = useState('');
+function Login() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
 
-        const navigate = useNavigate();
+    const auth = useUserAuth();
 
-        const handleLogin = async (e) => {
-            e.preventDefault();
-            try {
-                const response = await axios.post('http://localhost:5000/login', {
-                    username,
-                    password,
-                });
-                console.log('Login successful:', response.data);
-                localStorage.setItem('token', response.data.token);
-                
-            } catch (error) {
-                console.error('Error during login:', error.response.data);
-            }
-            navigate('/home');
-        };
+    const navigate = useNavigate();
+    const location = useLocation();
 
-        return (
-            <>
-                <Container>
-                    <h1>Login</h1>
-                    <form onSubmit={handleLogin}>
-                        <label>
-                            Username:
-                            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-                        </label>
-                        <br />
-                        <label>
-                            Password:
-                            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                        </label>
-                        <br />
-                        <button type="submit">Login</button>
-                    </form>
-                </Container>
-            </>
-        );
-    }
+    const redirectPath = location.state?.path || '/home';
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        try {
+            auth.login(username, password);
+            navigate(redirectPath, { replace: true });
+        }
+        catch (err) {
+            console.log(err);
+        }
+    };
+
+    return (
+        <>
+            <Container>
+                <h1>Login</h1>
+                <form onSubmit={handleLogin}>
+                    <label>
+                        Username:
+                        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+                    </label>
+                    <br />
+                    <label>
+                        Password:
+                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    </label>
+                    <br />
+                    <button type="submit">Login</button>
+                </form>
+            </Container>
+        </>
+    );
+}
 export default Login;
