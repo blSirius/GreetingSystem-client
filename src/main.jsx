@@ -21,7 +21,6 @@ import Home from './component/Home.jsx';
 import Album from './component/Album.jsx';
 import NewCollection from './component/NewCollection.jsx';
 
-
 //create router
 const router = createBrowserRouter([
   {
