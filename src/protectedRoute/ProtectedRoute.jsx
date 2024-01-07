@@ -1,22 +1,33 @@
-// ProtectedRoute.jsx
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useUserAuth } from './UserAuthContext';
 
 function ProtectedRoute({ children }) {
-   
-    const auth = useUserAuth();
-    const location = useLocation();
+    const { getCurrentUser } = useUserAuth();
+    const [isAuthenticated, setIsAuthenticated] = useState(null)
 
-    // console.log('currentUser : ', auth.getCurrentUser());
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await getCurrentUser();
+                const currentUser = result;
+                if (!currentUser) {
+                    setIsAuthenticated(false);
+                } else {
+                    setIsAuthenticated(true);
+                }
+            } catch (error) {
+                console.error('Error fetching user data', error);
+                setIsAuthenticated(false);
+            }
+        };
 
-    const currentUser = auth.getCurrentUser();
+        fetchData();
+    }, []);
 
-    if (!currentUser) {
-        return <Navigate to="/login" state={{ path: location.pathname }} />;
+    if (isAuthenticated === null) {
+        return null;
     }
-
-    return children;
+    return isAuthenticated ? children : <Navigate to="/login" />;
 }
-
 export default ProtectedRoute;

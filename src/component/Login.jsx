@@ -1,24 +1,21 @@
 import React, { useState } from 'react';
 import { Container } from 'react-bootstrap';
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUserAuth } from '../protectedRoute/UserAuthContext';
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const auth = useUserAuth();
+    const { login } = useUserAuth();
 
     const navigate = useNavigate();
-    const location = useLocation();
-
-    const redirectPath = location.state?.path || '/home';
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            auth.login(username, password);
-            navigate(redirectPath, { replace: true });
+            await login(username, password);
+            navigate('/home');
         }
         catch (err) {
             console.log(err);

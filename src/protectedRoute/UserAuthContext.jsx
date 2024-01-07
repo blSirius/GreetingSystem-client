@@ -5,71 +5,55 @@ import axios from 'axios';
 const UserAuthContext = createContext();
 
 export const UserAuthContextProvider = ({ children }) => {
-    const [user, setUser] = useState('');
+  const [user, setUser] = useState('');
 
-    useEffect(() => {
-        decodedToken();
-    }, []);
+  const getCurrentUser = async () => {
+    const token = localStorage.getItem('token');
 
-    const login = async (username, password) => {
-        try {
-            const response = await axios.post('http://localhost:5000/login', {
-                username,
-                password,
-            });
-            console.log('Login successful:', response.data);
-            localStorage.setItem('token', response.data.token);
-            decodedToken();
-        } catch (error) {
-            console.error('Error during login:', error.response.data);
-        }
-    };
-
-    const decodedToken = async () => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const response = await axios.post('http://localhost:5000/decode-token', {
-                    token,
-                });
-                setUser(response.data.decoded.username);
-            } catch (error) {
-                console.error('Error decoding token:', error.response ? error.response.data : error.message);
-                localStorage.removeItem('token');
-            }
-        }
-    };
-
-    const logout = () => {
-        setUser('');
-        localStorage.removeItem('token');
-    };
-
-    const getCurrentUser = async () => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const response = await axios.post('http://localhost:5000/decode-token', {
-                    token,
-                });
-                const currentUser = response.data.decoded.username;
-                return currentUser;
-            } catch (error) {
-                console.error('Error decoding token:', error.response ? error.response.data : error.message);
-                localStorage.removeItem('token');
-            }
-        }
-        return null;
-
+    if (!token) {
+      return null;
     }
 
-    return (
-        <UserAuthContext.Provider value={{ user, login, logout, getCurrentUser }} >
-            {children}
-        </UserAuthContext.Provider>
-    );
-}
+    try {
+      const response = await axios.post('http://localhost:5000/decode-token', { token });
+      const currentUser = response.data.decoded.username;
+      setUser(currentUser);
+      return currentUser;
+    } catch (error) {
+      handleTokenError(error);
+    }
+  };
+
+  const login = async (username, password) => {
+    try {
+      const response = await axios.post('http://localhost:5000/login', { username, password });
+      console.log('Login state');
+      localStorage.setItem('token', response.data.token);
+    } catch (error) {
+      console.error('Error during login:', error.response.data);
+    }
+  };
+
+  const logout = () => {
+    setUser('');
+    localStorage.removeItem('token');
+  };
+
+  const handleTokenError = (error) => {
+    console.error('Error decoding token:', error.response ? error.response.data : error.message);
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+    }
+    throw error;
+  };
+
+  return (
+    <UserAuthContext.Provider value={{ user, login, logout, getCurrentUser }}>
+      {children}
+    </UserAuthContext.Provider>
+  );
+};
 
 export const useUserAuth = () => {
-    return useContext(UserAuthContext);
-}
+  return useContext(UserAuthContext);
+};
