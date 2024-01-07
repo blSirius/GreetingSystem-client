@@ -1,0 +1,16 @@
+body{
+    background-color: whitesmoke;
+}
+
+.searchBar{
+    margin-top: 5rem;
+}
+
+.newCollectionBtn{
+    margin-top: 2rem;
+    text-align: right;
+}
+
+.table{
+    margin-top: 2rem;
+}

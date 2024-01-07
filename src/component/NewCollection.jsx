@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Container, Form } from 'react-bootstrap';
 import axios from 'axios';
-import NavBar from './NavBar';
-import AddLabelCSS from '../style/AddLabel.module.css'
+import NavBar from './nav/NavBar';
+import NewCollectionCSS from './style/NewCollection.module.css'
 
-const AddLabel = () => {
+
+const NewCollection = () => {
   const [file, setFile] = useState(null);
   const [folderName, setFolderName] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
@@ -13,7 +14,6 @@ const AddLabel = () => {
     const selectedFile = event.target.files[0];
     setFile(selectedFile);
 
-    // Create a URL for the selected file and set it as the image preview
     const previewURL = URL.createObjectURL(selectedFile);
     setImagePreview(previewURL);
   };
@@ -43,13 +43,13 @@ const AddLabel = () => {
   return (
     <>
       <NavBar />
-      <Container className={AddLabelCSS.container} >
+      <Container className={NewCollectionCSS.container} >
         <div style={{marginTop: '100px'}} >
           <input
             type="text"
             placeholder="Folder Name"
             value={folderName}
-            className={AddLabelCSS.label_input}
+            className={NewCollectionCSS.label_input}
             onChange={handleFolderNameChange}
           />
           <br />
@@ -57,11 +57,11 @@ const AddLabel = () => {
           <br />
           {imagePreview && <img src={imagePreview} alt="Selected" style={{ maxWidth: '100%' }} />}
           <br />
-          <button className={AddLabelCSS.button} onClick={handleUpload}>Upload</button>
+          <button className={NewCollectionCSS.button} onClick={handleUpload}>Upload</button>
         </div>
       </Container>
     </>
   );
 };
 
-export default AddLabel;
+export default NewCollection;

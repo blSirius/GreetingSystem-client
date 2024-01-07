@@ -5,7 +5,7 @@ import Video from '../style/video.module.css'
 
 import { Container } from 'react-bootstrap';
 
-function App() {
+function FaceDetection() {
 
   const videoHeight = 450;
   const videoWidth = 600;
@@ -135,4 +135,4 @@ function App() {
   );
 }
 
-export default App;
+export default FaceDetection;

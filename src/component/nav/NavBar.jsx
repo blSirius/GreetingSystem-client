@@ -1,19 +1,30 @@
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
+import { Container, Nav, Navbar, NavDropdown, Button } from 'react-bootstrap'
+import { useNavigate } from 'react-router-dom';
+import { useUserAuth } from '../../context/UserAuthContext';
 
 function NavBar() {
+  const { logout } = useUserAuth();
+  const navigate = useNavigate();
+
+  const handleLogOut = async () => {
+    logout();
+    navigate('/');
+  }
   return (
     <>
       <Navbar bg="dark" data-bs-theme="dark">
         <Container>
-          <Navbar.Brand href="#home">Home</Navbar.Brand>
-          <Nav className="me-auto">
-            <Nav.Link href="#home">Album</Nav.Link>
-            <Nav.Link href="#features">Search</Nav.Link>
 
-            <NavDropdown title="Editing" id="navbarScrollingDropdown">
+          {/* brand */}
+          <Navbar.Brand href="/home">Home</Navbar.Brand>
+
+          <Nav className="me-auto">
+
+            {/* menu */}
+            <Nav.Link href="/album">Album</Nav.Link>
+
+            {/* dropdown */}
+            <NavDropdown title="dropdown" id="navbarScrollingDropdown">
 
               <NavDropdown.Item href="#action3">
                 Add Person
@@ -32,6 +43,8 @@ function NavBar() {
               </NavDropdown.Item>
 
             </NavDropdown>
+
+            <Button variant='danger' onClick={handleLogOut} >Log out</Button>
           </Nav>
         </Container>
       </Navbar>
