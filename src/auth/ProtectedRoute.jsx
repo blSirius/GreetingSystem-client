@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useUserAuth } from './UserAuthContext';
+import { useUserAuth } from '../context/UserAuthContext';
 
 function ProtectedRoute({ children }) {
     const { getCurrentUser } = useUserAuth();

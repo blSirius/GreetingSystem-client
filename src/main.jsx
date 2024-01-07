@@ -1,21 +1,25 @@
 import React from 'react'
-import ReactDOM from 'react-dom/client'; // Import createRoot from react-dom/client
+
+//router
+import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+//context
+import { UserAuthContextProvider } from './context/UserAuthContext.jsx';
+
+//styles
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 
-// import AddLabels from './component/AddLabel.jsx';
-// import Video from './component/Video.jsx'
-import Canvas from './component/Canvas.jsx';
-import Register from './component/Register.jsx';
-import Login from './component/Login.jsx';
-import ProtectedRoute from './protectedRoute/ProtectedRoute.jsx';
-import AddLabel from './component/AddLabel.jsx'
+//component
+import ProtectedRoute from './auth/ProtectedRoute.jsx';
+import Register from './component/login/Register.jsx';
+import Login from './component/login/Login.jsx';
 import Home from './component/Home.jsx';
-import Video from './component/Video.jsx'
+import Album from './component/Album.jsx';
+import AddLabel from './component/AddLabel.jsx'
 
-import { UserAuthContextProvider } from './protectedRoute/UserAuthContext.jsx';
-
+//create router
 const router = createBrowserRouter([
   {
     path: "/",
@@ -30,21 +34,14 @@ const router = createBrowserRouter([
     element: <Login />
   },
   {
-    path: '/canvas',
-    element: <ProtectedRoute><Canvas /></ProtectedRoute>
+    path: '/home',
+    element: <ProtectedRoute><Home /></ProtectedRoute>
   },
   {
     path: '/addLabel',
     element: <AddLabel />
   },
-  {
-    path: '/home',
-    element: <ProtectedRoute><Home /></ProtectedRoute>
-  },
-  {
-    path: '/video',
-    element: <Video />
-  }
+
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(

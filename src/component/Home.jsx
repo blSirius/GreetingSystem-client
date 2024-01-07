@@ -1,7 +1,7 @@
 import React from 'react'
 import NavBar from './NavBar'
 import { Container } from 'react-bootstrap'
-import { useUserAuth } from '../protectedRoute/UserAuthContext';
+import { useUserAuth } from '../context/UserAuthContext';
 import { useNavigate } from 'react-router-dom';
 
 function Home() {

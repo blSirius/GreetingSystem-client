@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
-import { useUserAuth } from '../protectedRoute/UserAuthContext';
+import { useUserAuth } from '../../context/UserAuthContext';
 
 function Login() {
     const [username, setUsername] = useState('');
